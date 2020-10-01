@@ -44,8 +44,9 @@ const followersArray = ['tetondan', 'dustinmyers', 'justsml', 'luishrd', 'bigkne
 
 followersArray.forEach((ele) => {
   axios.get(`https://api.github.com/users/${ele}`)
-  .then(res =>
+  .then(res => {
     document.querySelector('.cards').appendChild(cardMaker(res.data))
+}
     )
   .catch(err => {
     console.log('error')
@@ -124,3 +125,34 @@ function cardMaker(gitObject) {
     luishrd
     bigknell
 */
+
+
+function requestFollower(str) {
+  // debugger
+  axios.get(`https://api.github.com/users/${str}`)
+  .then(res => {
+    console.log(res.data.followers_url)
+    document.querySelector('.cards').appendChild(cardMaker(res.data))
+    return axios.get(res.data.followers_url)
+  })
+  .then(res => {
+    console.log(res)
+    let followerArray = res.data.map((followerObject) => {
+      return followerObject.login
+    })
+    return followerArray
+  })
+  .then(res => {
+    res.forEach(follower => {
+      axios.get(`https://api.github.com/users/${follower}`)
+      .then(res => {
+        document.querySelector('.cards').appendChild(cardMaker(res.data))
+      })
+    })
+  })
+  .catch(err => {
+    console.log('error')
+  })
+}
+
+requestFollower('dombruno')
